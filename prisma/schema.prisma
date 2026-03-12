@@ -1,0 +1,348 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ADMIN & SETTINGS (Zajedničko)
+// ============================================
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model SiteSettings {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String @db.Text
+
+  @@map("site_settings")
+}
+
+model AdSettings {
+  id                  Int      @id @default(autoincrement())
+  enabledOnHomepage   Boolean  @default(true)
+  enabledOnArticles   Boolean  @default(true)
+  enabledOnCategories Boolean  @default(true)
+  enabledOnCompetitions Boolean @default(true)
+  enabledOnMatches    Boolean  @default(true)
+  adsenseClientId     String?  // ca-pub-XXXXXXXXXXXXXXXX
+  
+  // Ad slot IDs for different positions
+  homepageAdSlot       String?  // Homepage ad slot ID
+  articleContentAdSlot String?  // Article content ad slot ID
+  articleBottomAdSlot  String?  // Article bottom ad slot ID
+  articleSidebarAdSlot String?  // Article sidebar ad slot ID (future use)
+  categoryTopAdSlot    String?  // Category top ad slot ID
+  categoryInlineAdSlot String?  // Category inline ad slot ID
+  mapSidebarAdSlot     String?  // Map sidebar ad slot ID (desktop)
+  mapBottomAdSlot      String?  // Map bottom ad slot ID (mobile/tablet)
+  competitionAdSlot    String?  // Competition ad slot ID
+  matchAdSlot          String?  // Match ad slot ID
+  rankingAdSlot        String?  // Ranking ad slot ID
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("ad_settings")
+}
+
+// ============================================
+// CONTENT MANAGEMENT (Članci i Kategorije)
+// ============================================
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  coverImage  String?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
+
+  @@map("categories")
+}
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String?  @db.Text
+  videoUrl    String?
+  videoType   String?
+  coverImage  String?
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  categoryId  Int
+  locationId  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, map: "articles_category_fkey")
+  location    Location? @relation("ArticleLocation", fields: [locationId], references: [id], onDelete: SetNull, map: "articles_location_fkey")
+  
+  // Media relations
+  media       ArticleMedia[]
+  
+  // Reverse relation for locations that link directly to this article
+  directLocations Location[] @relation("LocationArticle")
+
+  @@index([categoryId], map: "articles_categoryId_idx")
+  @@index([locationId], map: "articles_locationId_idx")
+  @@map("articles")
+}
+
+model Media {
+  id          Int    @id @default(autoincrement())
+  filename    String
+  originalName String
+  url         String
+  type        String // image, video
+  mimeType    String
+  size        Int
+  
+  // Relations
+  articles    ArticleMedia[]
+  competitors CompetitorMedia[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("media")
+}
+
+model ArticleMedia {
+  id        Int @id @default(autoincrement())
+  articleId Int
+  mediaId   Int
+  order     Int @default(0)
+  
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, map: "article_media_article_fkey")
+  media     Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade, map: "article_media_media_fkey")
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([articleId, mediaId])
+  @@index([articleId], map: "article_media_articleId_idx")
+  @@index([mediaId], map: "article_media_mediaId_idx")
+  @@map("article_media")
+}
+
+model Location {
+  id          Int       @id @default(autoincrement())
+  name        String
+  latitude    Float
+  longitude   Float
+  description String?   @db.Text
+  
+  // Direct media links (alternative to article relation)
+  youtubeUrl  String?
+  articleId   Int?
+  iconUrl     String?   // Custom icon for map marker
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  article     Article?  @relation("LocationArticle", fields: [articleId], references: [id], onDelete: SetNull)
+  articles    Article[] @relation("ArticleLocation")
+  
+  @@map("locations")
+}
+
+// ============================================
+// COMPETITION SYSTEM (Natjecanja - Najtvrđe Jaje)
+// ============================================
+
+// Natjecatelj
+model Competitor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  email       String?  @unique
+  phone       String?
+  city        String?
+  country     String?  @default("Bosna i Hercegovina")
+  profileImage String?
+  bio         String?  @db.Text
+  familyGroup String?
+  isActive    Boolean  @default(true)
+  
+  // Statistika
+  totalWins   Int      @default(0)
+  totalLosses Int      @default(0)
+  
+  // BRJ (Broj Razbijenih Jaja) statistika - umjesto ELO
+  totalEggsBroken Int  @default(0)  // Ukupan broj razbijenih protivničkih jaja
+  totalEggsLost   Int  @default(0)  // Ukupan broj izgubljenih vlastitih jaja
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  homeMatches Match[]  @relation("HomeCompetitor")
+  awayMatches Match[]  @relation("AwayCompetitor")
+  rankings    Ranking[]
+  media       CompetitorMedia[]
+
+  @@map("competitors")
+}
+
+// Veza između natjecatelja i medija (galerija slika)
+model CompetitorMedia {
+  id           Int        @id @default(autoincrement())
+  competitorId Int
+  mediaId      Int
+  order        Int        @default(0)
+  
+  competitor   Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  media        Media      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime   @default(now())
+  
+  @@unique([competitorId, mediaId])
+  @@index([competitorId])
+  @@index([mediaId])
+  @@map("competitor_media")
+}
+
+// Natjecanje/Turnir
+model Competition {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  coverImage  String?
+  status      String   @default("upcoming") // upcoming, ongoing, completed, cancelled
+  
+  // Pravila natjecanja
+  tournamentType    String @default("group_knockout") // group_knockout, knockout, group_only
+  matchFormat       String? @db.Text // Opis kako se igra
+  prizeInfo         String? @db.Text
+  eggsPerCompetitor Int    @default(30)  // Broj jaja po natjecatelju
+  numberOfGroups    Int    @default(8)   // Broj grupa u grupnoj fazi
+  
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  rounds      Round[]
+  rankings    Ranking[]
+  matches     Match[]  @relation("CompetitionMatches")
+
+  @@map("competitions")
+}
+
+// Kolo natjecanja (za Bergerov sistem)
+model Round {
+  id            Int         @id @default(autoincrement())
+  competitionId Int
+  roundNumber   Int
+  name          String      // npr. "1. kolo", "2. kolo", "Finale"
+  
+  // Tip kruga i bodovanje
+  roundType       String    @default("group")  // group, round_of_16, quarterfinal, semifinal, third_place, final
+  pointMultiplier Int       @default(1)        // Množitelj bodova: 1=grupa, 2=osmina, 3=četvrt, 4=polu, 5=finale
+  groupNumber     Int?                         // Broj grupe za grupnu fazu (1-8)
+  
+  startDate     DateTime?
+  endDate       DateTime?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  matches       Match[]
+
+  @@unique([competitionId, roundNumber, groupNumber])
+  @@index([competitionId])
+  @@map("rounds")
+}
+
+// Meč između dva natjecatelja
+model Match {
+  id              Int       @id @default(autoincrement())
+  roundId         Int?
+  competitionId   Int?      // Direktna veza na natjecanje
+  
+  homeCompetitorId Int
+  awayCompetitorId Int
+  
+  // Rezultat - broj razbijenih jaja protivniku
+  homeEggsBroken  Int       @default(0)  // Koliko je domaćin razbio gostujućem
+  awayEggsBroken  Int       @default(0)  // Koliko je gost razbio domaćinu
+  result          String?   // "home_win", "away_win" (nema neriješenog)
+  
+  // Detalji meča
+  matchDate       DateTime?
+  location        String?
+  videoUrl        String?
+  description     String?   @db.Text
+  
+  // Mediji (JSON array URLs)
+  images          String[]
+  
+  status          String    @default("scheduled") // scheduled, in_progress, completed, cancelled
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  round           Round?       @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  competition     Competition? @relation("CompetitionMatches", fields: [competitionId], references: [id], onDelete: Cascade)
+  homeCompetitor  Competitor   @relation("HomeCompetitor", fields: [homeCompetitorId], references: [id], onDelete: Restrict)
+  awayCompetitor  Competitor   @relation("AwayCompetitor", fields: [awayCompetitorId], references: [id], onDelete: Restrict)
+
+  @@index([roundId])
+  @@index([competitionId])
+  @@index([homeCompetitorId])
+  @@index([awayCompetitorId])
+  @@map("matches")
+}
+
+// Rang lista - BRJ (Broj Razbijenih Jaja)
+model Ranking {
+  id            Int         @id @default(autoincrement())
+  competitionId Int?        // Null za opću rang listu
+  competitorId  Int
+  
+  position      Int
+  points        Int         @default(0)         // Osnovni bodovi
+  weightedPoints Int        @default(0)         // Bodovi s multiplikatorom po krugovima
+  wins          Int         @default(0)
+  losses        Int         @default(0)
+  eggsBroken    Int         @default(0)         // Broj razbijenih protivničkih jaja
+  eggsLost      Int         @default(0)         // Broj izgubljenih vlastitih jaja
+  
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  competition   Competition? @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  competitor    Competitor   @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@unique([competitionId, competitorId])
+  @@index([competitionId])
+  @@index([competitorId])
+  @@map("rankings")
+}

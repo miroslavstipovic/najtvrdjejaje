@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Story Portal - flash.ba</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-indigo-600">
+                    <i class="fas fa-video mr-2"></i>Video Story Portal
+                </h1>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="text-gray-700 hover:text-indigo-600 transition">Home</a>
+                    <a href="#about" class="text-gray-700 hover:text-indigo-600 transition">About</a>
+                    <a href="#categories" class="text-gray-700 hover:text-indigo-600 transition">Categories</a>
+                    <a href="#contact" class="text-gray-700 hover:text-indigo-600 transition">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-bold text-gray-800 mb-6">
+                Welcome to Video Story Portal
+            </h2>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                A modern platform for sharing video stories and articles. 
+                Built with Next.js, TypeScript, and cutting-edge web technologies.
+            </p>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 max-w-2xl mx-auto mb-8">
+                <p class="text-yellow-700">
+                    <i class="fas fa-construction mr-2"></i>
+                    <strong>Coming Soon:</strong> Full Next.js application deployment in progress
+                </p>
+            </div>
+            <a href="#about" class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition inline-block">
+                Learn More
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Platform Features</h3>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6 rounded-lg bg-gray-50">
+                    <i class="fas fa-video text-4xl text-indigo-600 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-2">Video Management</h4>
+                    <p class="text-gray-600">Support for YouTube, Vimeo, and direct uploads with React Player integration</p>
+                </div>
+                <div class="text-center p-6 rounded-lg bg-gray-50">
+                    <i class="fas fa-edit text-4xl text-indigo-600 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-2">Content Management</h4>
+                    <p class="text-gray-600">Rich article creation, category organization, and SEO-friendly features</p>
+                </div>
+                <div class="text-center p-6 rounded-lg bg-gray-50">
+                    <i class="fas fa-shield-alt text-4xl text-indigo-600 mb-4"></i>
+                    <h4 class="text-xl font-semibold mb-2">Admin System</h4>
+                    <p class="text-gray-600">Secure authentication, role-based access, and comprehensive admin interface</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Built With Modern Technology</h3>
+            <div class="grid md:grid-cols-4 gap-6 text-center">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <i class="fab fa-react text-4xl text-blue-500 mb-2"></i>
+                    <h4 class="font-semibold">Next.js 15</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <i class="fab fa-js-square text-4xl text-yellow-500 mb-2"></i>
+                    <h4 class="font-semibold">TypeScript</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <i class="fas fa-database text-4xl text-green-500 mb-2"></i>
+                    <h4 class="font-semibold">Prisma + MySQL</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <i class="fab fa-css3-alt text-4xl text-purple-500 mb-2"></i>
+                    <h4 class="font-semibold">Tailwind CSS</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Preview -->
+    <section id="categories" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12">Content Categories</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-2">Technology</h4>
+                    <p>Latest tech news and video tutorials</p>
+                </div>
+                <div class="bg-gradient-to-r from-green-500 to-teal-600 text-white p-6 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-2">Education</h4>
+                    <p>Educational content and learning resources</p>
+                </div>
+                <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-6 rounded-lg">
+                    <h4 class="text-xl font-semibold mb-2">Entertainment</h4>
+                    <p>Fun videos and engaging stories</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-3xl font-bold mb-8">Get In Touch</h3>
+            <p class="text-gray-600 mb-8">Interested in the full platform? Contact us for more information.</p>
+            <div class="max-w-md mx-auto">
+                <form class="space-y-4">
+                    <input type="text" placeholder="Your Name" class="w-full p-3 rounded-lg border">
+                    <input type="email" placeholder="Your Email" class="w-full p-3 rounded-lg border">
+                    <textarea placeholder="Your Message" rows="4" class="w-full p-3 rounded-lg border"></textarea>
+                    <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Video Story Portal. Built with Next.js and deployed on flash.ba</p>
+            <div class="mt-4">
+                <a href="https://github.com/miroslavstipovic/video-story-portal" class="text-indigo-400 hover:text-indigo-300 transition">
+                    <i class="fab fa-github mr-2"></i>View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Form submission (placeholder)
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! This is a demo form.');
+        });
+    </script>
+</body>
+</html>

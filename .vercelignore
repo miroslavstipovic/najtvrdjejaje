@@ -1,0 +1,24 @@
+# Exclude large picture files from Vercel deployment
+# These should be uploaded to Vercel Blob Storage instead
+pictures/
+
+# Exclude local database files
+*.sql
+
+# Exclude migration scripts (not needed in production)
+scripts/
+
+# Exclude development files
+.env.local
+.env.development
+
+# Exclude test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Exclude documentation
+*.md
+!README.md
+

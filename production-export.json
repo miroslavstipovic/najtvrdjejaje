@@ -1,0 +1,250 @@
+{
+  "articles": [
+    {
+      "id": 1,
+      "title": "Welcome to Our Video Portal",
+      "slug": "welcome-to-our-video-portal",
+      "content": "This is our featured story that showcases the power of video storytelling. Our platform brings you the latest news, entertainment, and educational content through engaging video presentations.",
+      "excerpt": "Discover amazing video content on our new portal",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "videoType": "youtube",
+      "coverImage": null,
+      "isPublished": true,
+      "isFeatured": false,
+      "categoryId": 1,
+      "createdAt": "2025-09-15T10:51:48.387Z",
+      "updatedAt": "2025-09-15T10:56:56.100Z"
+    },
+    {
+      "id": 2,
+      "title": "Latest Tech Innovations in 2024",
+      "slug": "latest-tech-innovations",
+      "content": "Explore the cutting-edge technologies that are shaping our future. From AI advancements to sustainable energy solutions.",
+      "excerpt": "A comprehensive look at technological breakthroughs",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "videoType": "youtube",
+      "coverImage": null,
+      "isPublished": true,
+      "isFeatured": false,
+      "categoryId": 1,
+      "createdAt": "2025-09-15T10:51:48.401Z",
+      "updatedAt": "2025-09-15T10:51:48.401Z"
+    },
+    {
+      "id": 3,
+      "title": "Breaking News Update",
+      "slug": "breaking-news-update",
+      "content": "Stay informed with the latest breaking news from around the world. Our team brings you real-time updates on the most important stories.",
+      "excerpt": "Latest breaking news and updates",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "videoType": "youtube",
+      "coverImage": null,
+      "isPublished": true,
+      "isFeatured": false,
+      "categoryId": 4,
+      "createdAt": "2025-09-15T10:51:48.409Z",
+      "updatedAt": "2025-09-15T10:51:48.409Z"
+    },
+    {
+      "id": 4,
+      "title": "Siromaštvo pretvorili u pravo malo seosko bogatstvo",
+      "slug": "siroma-tvo-pretvorili-u-pravo-malo-seosko-bogatstvo",
+      "content": "U malom selu kod Zenice, priča Esade i Sanela Mahmića postala je simbol nade i borbe. Prije dvije godine, Sanel je zadobio tešku povredu na poslu, što je porodicu gurnulo u tešku ekonomsku situaciju. No, Esada, hrabra supruga i majka, nije se predavala. S motornom pilom u ruci, odlazila je u šumu, noseći drva na leđima kako bi prehranjivala porodicu. Njena slika s tovarom drva brzo je postala viralna, dirnuvši humane ljude širom svijeta.\n\nOva situacija pokrenula je val podrške koji im je omogućio da preokrenu svoj život. Esada je uspjela otplatiti dva kredita i unaprijediti svoj život. \"Kupili smo kuću, novu motornu pilu, automobil i traktor,\" ponosno ističe. Osim toga, opremili su svoj dom novim kupatilom i kuhinjom, a nedavno su dodali i termoizolacijsku fasadu. \"Nabavili smo kravu i kokoši, stvarajući pravo malo seosko bogatstvo,\" dodaje Sanel.\n\nMahmići su postali ekonomski neovisni i svakodnevno napreduju. Rad i trud su im postali stil života. \"Sada radimo više nego ikad, ali s radošću i ponosom,\" kaže Sanel. Ne samo da obavljaju seoske poslove, već često uzimaju i dodatne dnevnice kako bi osigurali bolji život za porodicu.\n\nOva inspirativna priča nije ostala neprimjećena. Mahmići su postali uzor mnogima u zajednici. \"I dalje nam se javljaju ljudi koji su nam pomogli kada je bilo najteže. Održavamo te kontakte, i to nam puno znači,\" naglašava Esada, ističući važnost zajedništva.\n\nEsada i Sanel Mahmić su primjer kako trud, zajedništvo i ljudska dobrota mogu promijeniti život. Njihova priča odražava snagu porodice i sposobnost da se iz najtežih situacija izađe jači. Posjetili smo ovaj inspirativni par i zabilježili njihov put ka boljem sutra.",
+      "excerpt": "Esada i Sanel Mahmić su primjer kako trud, zajedništvo i ljudska dobrota mogu promijeniti život. ",
+      "videoUrl": "https://www.youtube.com/watch?v=IP-uwQyjUqk&t=204s",
+      "videoType": "youtube",
+      "coverImage": "/uploads/articles/2652da45-4a4c-4825-9c45-e2ec85c80fa2.jpg",
+      "isPublished": true,
+      "isFeatured": true,
+      "categoryId": 4,
+      "createdAt": "2025-09-15T10:56:56.176Z",
+      "updatedAt": "2025-09-15T13:11:46.014Z"
+    },
+    {
+      "id": 5,
+      "title": "neki naslov",
+      "slug": "neki-naslov",
+      "content": "ovaj sadržaj",
+      "excerpt": "neki sažetak",
+      "videoUrl": "https://www.youtube.com/watch?v=jUoBMfEvbGE&t=1141s",
+      "videoType": "youtube",
+      "coverImage": "/uploads/articles/5088e365-13f1-48c7-9757-f25824018861.jpg",
+      "isPublished": true,
+      "isFeatured": false,
+      "categoryId": 4,
+      "createdAt": "2025-09-15T13:02:28.933Z",
+      "updatedAt": "2025-09-15T13:11:46.014Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Latest tech news and reviews",
+      "coverImage": null,
+      "createdAt": "2025-09-15T10:51:48.327Z",
+      "updatedAt": "2025-09-15T10:51:48.327Z"
+    },
+    {
+      "id": 2,
+      "name": "Entertainment",
+      "slug": "entertainment",
+      "description": "Movies, music, and celebrity news",
+      "coverImage": null,
+      "createdAt": "2025-09-15T10:51:48.340Z",
+      "updatedAt": "2025-09-15T10:51:48.340Z"
+    },
+    {
+      "id": 3,
+      "name": "Sports",
+      "slug": "sports",
+      "description": "Sports news and highlights",
+      "coverImage": null,
+      "createdAt": "2025-09-15T10:51:48.360Z",
+      "updatedAt": "2025-09-15T10:51:48.360Z"
+    },
+    {
+      "id": 4,
+      "name": "News",
+      "slug": "news",
+      "description": "Breaking news and current events",
+      "coverImage": null,
+      "createdAt": "2025-09-15T10:51:48.371Z",
+      "updatedAt": "2025-09-15T10:51:48.371Z"
+    },
+    {
+      "id": 5,
+      "name": "kategorija",
+      "slug": "kategorija",
+      "description": "kategorija2",
+      "coverImage": null,
+      "createdAt": "2025-09-15T13:03:32.320Z",
+      "updatedAt": "2025-09-15T13:03:32.320Z"
+    }
+  ],
+  "media": [],
+  "articleMedia": [],
+  "siteSettings": [
+    {
+      "id": 1,
+      "key": "site_name",
+      "value": "Flash.ba Video Portal"
+    },
+    {
+      "id": 2,
+      "key": "site_description",
+      "value": "Your destination for video stories and news"
+    },
+    {
+      "id": 3,
+      "key": "contact_email",
+      "value": "contact@flash.ba"
+    },
+    {
+      "id": 76,
+      "key": "favicon_url",
+      "value": ""
+    },
+    {
+      "id": 4,
+      "key": "contact_phone",
+      "value": "+123 456 7890"
+    },
+    {
+      "id": 5,
+      "key": "contact_address",
+      "value": "123 Main Street\nCity, State 12345\nUnited States"
+    },
+    {
+      "id": 6,
+      "key": "office_hours",
+      "value": "Monday - Friday: 9:00 AM - 5:00 PM\nWeekend: Closed"
+    },
+    {
+      "id": 80,
+      "key": "social_facebook",
+      "value": ""
+    },
+    {
+      "id": 81,
+      "key": "social_twitter",
+      "value": ""
+    },
+    {
+      "id": 82,
+      "key": "social_instagram",
+      "value": ""
+    },
+    {
+      "id": 83,
+      "key": "social_youtube",
+      "value": ""
+    },
+    {
+      "id": 84,
+      "key": "social_linkedin",
+      "value": ""
+    },
+    {
+      "id": 85,
+      "key": "social_tiktok",
+      "value": ""
+    },
+    {
+      "id": 7,
+      "key": "about_title",
+      "value": "About Flash.ba"
+    },
+    {
+      "id": 8,
+      "key": "about_content",
+      "value": "Strancia o nama s nekim tekstom"
+    },
+    {
+      "id": 9,
+      "key": "mission_statement",
+      "value": "jedan dva tri"
+    },
+    {
+      "id": 10,
+      "key": "team_description",
+      "value": "We are a dedicated team of content creators, technologists, and storytellers working together to deliver exceptional video experiences."
+    },
+    {
+      "id": 11,
+      "key": "footer_about",
+      "value": "Your destination for engaging video stories and news content."
+    },
+    {
+      "id": 12,
+      "key": "copyright_text",
+      "value": "© 2024 Flash.ba Video Portal. All rights reserved."
+    }
+  ],
+  "admins": [
+    {
+      "id": 1,
+      "name": "Portal Admin",
+      "email": "admin@videoportal.com",
+      "createdAt": "2025-09-15T10:51:48.304Z",
+      "updatedAt": "2025-09-15T10:51:48.304Z"
+    },
+    {
+      "id": 2,
+      "name": "Flash.ba Admin",
+      "email": "admin@flash.ba",
+      "createdAt": "2025-09-25T11:08:15.543Z",
+      "updatedAt": "2025-09-25T11:08:15.543Z"
+    }
+  ],
+  "exportedAt": "2025-10-01T11:40:31.084Z",
+  "totalCounts": {
+    "articles": 5,
+    "categories": 5,
+    "media": 0,
+    "articleMedia": 0,
+    "siteSettings": 19,
+    "admins": 2
+  }
+}
