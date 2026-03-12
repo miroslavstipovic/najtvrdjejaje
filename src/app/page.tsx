@@ -68,7 +68,7 @@ export default async function HomePage() {
   let featuredArticle: FeaturedArticle | null = null
   let categories: Category[] = []
 
-  if (process.env.DATABASE_URL) {
+  if (process.env.PRISMA_POSTGRES) {
     try {
       // Use optimized service with parallel fetching
       // This fetches featured article, categories, articles, and counts in parallel

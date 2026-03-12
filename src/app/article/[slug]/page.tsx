@@ -203,7 +203,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 // Static generation disabled - using dynamic rendering
 // export async function generateStaticParams() {
 //   // Skip static generation during build if no database URL
-//   if (!process.env.DATABASE_URL) {
+//   if (!process.env.PRISMA_POSTGRES) {
 //     return []
 //   }
 
@@ -227,7 +227,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   const { slug } = await params
   
   // Skip metadata generation during build if no database URL
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRISMA_POSTGRES) {
     return {
       title: 'Video Story Portal',
       description: 'Video stories and articles',

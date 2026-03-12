@@ -5,7 +5,7 @@ export default async function AboutPage() {
   // Get site settings for about content
   let aboutContent, aboutTitle, missionStatement, teamDescription
 
-  if (process.env.DATABASE_URL) {
+  if (process.env.PRISMA_POSTGRES) {
     try {
       [aboutContent, aboutTitle, missionStatement, teamDescription] = await Promise.all([
         prisma.siteSettings.findUnique({ where: { key: 'about_content' } }),

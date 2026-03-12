@@ -244,7 +244,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 // Generate static paths for better performance
 export async function generateStaticParams() {
   // Skip static generation during build if no database URL
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRISMA_POSTGRES) {
     return []
   }
 
@@ -267,7 +267,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   
   // Skip metadata generation during build if no database URL
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRISMA_POSTGRES) {
     return {
       title: 'Video Story Portal',
       description: 'Browse video stories and articles by category',

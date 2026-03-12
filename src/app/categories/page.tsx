@@ -25,7 +25,7 @@ interface Category {
 export default async function CategoriesPage() {
   let categories: Category[] = []
 
-  if (process.env.DATABASE_URL) {
+  if (process.env.PRISMA_POSTGRES) {
     try {
       // Get all categories with article counts
       categories = await prisma.category.findMany({

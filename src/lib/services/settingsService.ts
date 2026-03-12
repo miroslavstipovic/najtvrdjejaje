@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
  * Uses React cache() to deduplicate requests within the same render
  */
 export const getSiteSettings = cache(async () => {
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRISMA_POSTGRES) {
     return { 
       faviconHref: '/favicon.ico', 
       adsenseClientId: null,
@@ -47,7 +47,7 @@ export const getSiteSettings = cache(async () => {
  */
 export const getCachedSiteSettings = unstable_cache(
   async () => {
-    if (!process.env.DATABASE_URL) {
+    if (!process.env.PRISMA_POSTGRES) {
       return { 
         faviconHref: '/favicon.ico', 
         adsenseClientId: null,
@@ -88,7 +88,7 @@ export const getCachedSiteSettings = unstable_cache(
  * Get branding settings only (logo and site name)
  */
 export const getBrandingSettings = cache(async () => {
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.PRISMA_POSTGRES) {
     return { 
       logoUrl: null,
       siteName: 'Najtvrđe Jaje',

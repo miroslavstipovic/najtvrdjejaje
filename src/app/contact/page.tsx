@@ -7,7 +7,7 @@ export default async function ContactPage() {
   let contactEmail, contactPhone, contactAddress, officeHours
   let socialFacebook, socialTwitter, socialInstagram, socialYoutube, socialLinkedin, socialTiktok
 
-  if (process.env.DATABASE_URL) {
+  if (process.env.PRISMA_POSTGRES) {
     try {
       [
         contactEmail, 

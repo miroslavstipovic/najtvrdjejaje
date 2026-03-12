@@ -6,7 +6,7 @@ export default async function DynamicFooter() {
   // Get footer settings
   let siteName, siteDescription, contactEmail, contactPhone, socialFacebook, socialTwitter, socialInstagram, socialYoutube, socialLinkedin, socialTiktok, copyrightText, footerAbout, logoUrl
 
-  if (process.env.DATABASE_URL) {
+  if (process.env.PRISMA_POSTGRES) {
     try {
       [
         siteName,
