@@ -13,8 +13,11 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-// Gracefully close Prisma connection in serverless environments
+// Gracefully disconnect in serverless environments
 if (process.env.VERCEL) {
-  // On Vercel, connections are automatically managed
-  // No need for explicit cleanup
+  // Pre-connect to warm up the connection pool
+  prisma.$connect().catch(e => {
+    console.error('Failed to connect to database:', e)
+  })
 }
+
