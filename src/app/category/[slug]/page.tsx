@@ -17,7 +17,18 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const currentPage = parseInt(page) || 1
 
   // Fetch category and articles using optimized service with request memoization
-  const { category, articles, totalPages, totalArticles } = await getCategoryWithArticles(slug, currentPage)
+  let category, articles, totalPages, totalArticles
+  
+  try {
+    const result = await getCategoryWithArticles(slug, currentPage)
+    category = result.category
+    articles = result.articles
+    totalPages = result.totalPages
+    totalArticles = result.totalArticles
+  } catch (error) {
+    console.error('Error fetching category:', error)
+    notFound()
+  }
 
   if (!category) {
     notFound()
