@@ -162,10 +162,13 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(competitor, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Competitor creation error:', error)
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? error?.message : undefined
+      },
       { status: 500 }
     )
   }
