@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
+import { put, del } from '@vercel/blob'
 import { processLogoImage, processFaviconImage } from '@/lib/imageProcessor'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
@@ -73,12 +71,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid file type. Allowed: PNG, JPEG, WebP, SVG, ICO' }, { status: 400 })
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'branding')
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-
     // Get file buffer
     const bytes = await file.arrayBuffer()
     const originalBuffer = Buffer.from(bytes)
@@ -92,23 +84,25 @@ export async function POST(request: NextRequest) {
     
     if (type === 'logo') {
       processedBuffer = await processLogoImage(originalBuffer, originalSize)
-      ext = 'png' // Keep PNG for logos (supports transparency)
+      ext = 'png'
     } else {
       processedBuffer = await processFaviconImage(originalBuffer, originalSize)
-      ext = 'png' // PNG for favicons
+      ext = 'png'
     }
 
-    // Generate filename
-    const filename = `${type}-${Date.now()}.${ext}`
-    const filepath = path.join(uploadDir, filename)
+    // Generate filename for Vercel Blob
+    const filename = `branding/${type}-${Date.now()}.${ext}`
 
-    // Write processed file
-    await writeFile(filepath, processedBuffer)
+    // Upload to Vercel Blob
+    const blob = await put(filename, processedBuffer, {
+      access: 'public',
+      contentType: 'image/png',
+    })
     
-    console.log(`✅ ${type} saved: ${(processedBuffer.length / 1024).toFixed(1)}KB (${Math.round((1 - processedBuffer.length / originalSize) * 100)}% reduction)`)
+    console.log(`✅ ${type} uploaded to Vercel Blob: ${(processedBuffer.length / 1024).toFixed(1)}KB (${Math.round((1 - processedBuffer.length / originalSize) * 100)}% reduction)`)
 
-    // Generate public URL
-    const publicUrl = `/uploads/branding/${filename}`
+    // Use Vercel Blob URL
+    const publicUrl = blob.url
 
     // Save to database
     const settingKey = type === 'logo' ? 'logo_url' : 'favicon_url'

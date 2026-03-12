@@ -123,48 +123,13 @@ export async function POST(request: NextRequest) {
     const uniqueFilename = `media/${uuidv4()}.${fileExtension}`
 
     try {
-      let fileUrl: string
-      
-      // Check if Vercel Blob is configured
-      const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-      
-      if (blobToken) {
-        try {
-          console.log('Using Vercel Blob storage...')
-          const blob = await put(uniqueFilename, file, {
-            access: 'public',
-          })
-          fileUrl = blob.url
-          console.log('✅ File uploaded to Vercel Blob:', blob.url)
-        } catch (blobError) {
-          const errorInfo = getErrorInfo(blobError)
-          console.error('❌ Vercel Blob upload failed:', errorInfo.message)
-          throw new Error(`Vercel Blob upload failed: ${errorInfo.message}`)
-        }
-      } else {
-        console.log('⚠️ BLOB_READ_WRITE_TOKEN not configured, using local storage fallback')
-        
-        // Fallback: Save to local public directory
-        const fs = await import('fs/promises')
-        const path = await import('path')
-        
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'media')
-        
-        // Ensure upload directory exists
-        try {
-          await fs.mkdir(uploadDir, { recursive: true })
-        } catch (mkdirError) {
-          console.log('Upload directory already exists or created')
-        }
-        
-        const localFilePath = path.join(uploadDir, uniqueFilename.split('/').pop() || `${uuidv4()}.jpg`)
-        const buffer = Buffer.from(await file.arrayBuffer())
-        await fs.writeFile(localFilePath, buffer)
-        
-        // Create URL for local file
-        fileUrl = `/uploads/media/${path.basename(localFilePath)}`
-        console.log('✅ File saved locally:', fileUrl)
-      }
+      // Upload to Vercel Blob
+      console.log('📤 Uploading to Vercel Blob storage...')
+      const blob = await put(uniqueFilename, file, {
+        access: 'public',
+      })
+      const fileUrl = blob.url
+      console.log('✅ File uploaded to Vercel Blob:', blob.url)
 
       // Save to database
       const media = await prisma.media.create({

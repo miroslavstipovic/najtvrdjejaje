@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
+import { put } from '@vercel/blob'
 import { processAvatarImage } from '@/lib/imageProcessor'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
@@ -56,12 +54,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'competitors')
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-
     // Get file buffer
     const bytes = await file.arrayBuffer()
     const originalBuffer = Buffer.from(bytes)
@@ -73,21 +65,20 @@ export async function POST(request: NextRequest) {
     const processedBuffer = await processAvatarImage(originalBuffer, originalSize)
 
     // Generate filename with timestamp
-    const filename = `competitor-${Date.now()}.jpg`
-    const filepath = path.join(uploadDir, filename)
+    const filename = `competitors/competitor-${Date.now()}.jpg`
 
-    // Write processed file
-    await writeFile(filepath, processedBuffer)
+    // Upload to Vercel Blob
+    const blob = await put(filename, processedBuffer, {
+      access: 'public',
+      contentType: 'image/jpeg',
+    })
 
     const compressionPercent = Math.round((1 - processedBuffer.length / originalSize) * 100)
-    console.log(`✅ Competitor image saved: ${(processedBuffer.length / 1024).toFixed(1)}KB (${compressionPercent}% reduction)`)
-
-    // Generate public URL
-    const publicUrl = `/uploads/competitors/${filename}`
+    console.log(`✅ Competitor image uploaded to Vercel Blob: ${(processedBuffer.length / 1024).toFixed(1)}KB (${compressionPercent}% reduction)`)
 
     return NextResponse.json({
       message: 'Slika uspješno uploadana',
-      url: publicUrl,
+      url: blob.url,
       originalSize,
       compressedSize: processedBuffer.length,
       compressionPercent,

@@ -72,49 +72,14 @@ export async function POST(request: NextRequest) {
     const uniqueFilename = `location-icons/${uuidv4()}.${fileExtension}`
 
     try {
-      let fileUrl: string
-      
-      // Check if Vercel Blob is configured
-      const blobToken = process.env.BLOB_READ_WRITE_TOKEN
-      
-      if (blobToken) {
-        try {
-          console.log('📍 Uploading location icon to Vercel Blob...')
-          const blob = await put(uniqueFilename, file, {
-            access: 'public',
-            addRandomSuffix: false,
-          })
-          fileUrl = blob.url
-          console.log('✅ Icon uploaded to Vercel Blob:', blob.url)
-        } catch (blobError) {
-          const errorInfo = getErrorInfo(blobError)
-          console.error('❌ Vercel Blob upload failed:', errorInfo.message)
-          throw new Error(`Vercel Blob upload failed: ${errorInfo.message}`)
-        }
-      } else {
-        console.log('⚠️ BLOB_READ_WRITE_TOKEN not configured, using local storage fallback')
-        
-        // Fallback: Save to local public directory
-        const fs = await import('fs/promises')
-        const path = await import('path')
-        
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'location-icons')
-        
-        // Ensure upload directory exists
-        try {
-          await fs.mkdir(uploadDir, { recursive: true })
-        } catch (mkdirError) {
-          console.log('Upload directory already exists or created')
-        }
-        
-        const localFilePath = path.join(uploadDir, uniqueFilename.split('/').pop() || `${uuidv4()}.png`)
-        const buffer = Buffer.from(await file.arrayBuffer())
-        await fs.writeFile(localFilePath, buffer)
-        
-        // Create URL for local file
-        fileUrl = `/uploads/location-icons/${path.basename(localFilePath)}`
-        console.log('✅ Icon saved locally:', fileUrl)
-      }
+      // Upload to Vercel Blob
+      console.log('📍 Uploading location icon to Vercel Blob...')
+      const blob = await put(uniqueFilename, file, {
+        access: 'public',
+        addRandomSuffix: false,
+      })
+      const fileUrl = blob.url
+      console.log('✅ Icon uploaded to Vercel Blob:', blob.url)
 
       return NextResponse.json({
         message: 'Icon uploaded successfully',
@@ -174,40 +139,14 @@ export async function DELETE(request: NextRequest) {
         const errorInfo = getErrorInfo(blobError)
         console.error('❌ Failed to delete from Vercel Blob:', errorInfo.message)
         
-        // Don't fail the request if deletion fails - it might already be deleted
-        return NextResponse.json({
-          message: 'Icon deletion attempted (may already be deleted)',
-          warning: errorInfo.message
-        })
-      }
-    } else if (iconUrl.startsWith('/uploads/location-icons/')) {
-      // Handle local file deletion
-      try {
-        const fs = await import('fs/promises')
-        const path = await import('path')
-        
-        const fileName = iconUrl.split('/').pop()
-        const filePath = path.join(process.cwd(), 'public', 'uploads', 'location-icons', fileName || '')
-        
-        await fs.unlink(filePath)
-        console.log('✅ Local icon file deleted:', filePath)
-        
-        return NextResponse.json({
-          message: 'Icon deleted successfully'
-        })
-      } catch (fsError) {
-        const errorInfo = getErrorInfo(fsError)
-        console.error('❌ Failed to delete local file:', errorInfo.message)
-        
         return NextResponse.json({
           message: 'Icon deletion attempted (may already be deleted)',
           warning: errorInfo.message
         })
       }
     } else {
-      // External URL - can't delete
       return NextResponse.json({
-        message: 'Cannot delete external URL. Only uploaded icons can be deleted.'
+        message: 'Cannot delete this URL. Only Vercel Blob uploads can be deleted.'
       })
     }
   } catch (error) {
