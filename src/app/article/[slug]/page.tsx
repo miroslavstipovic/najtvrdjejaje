@@ -229,7 +229,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   // Skip metadata generation during build if no database URL
   if (!process.env.PRISMA_POSTGRES) {
     return {
-      title: 'Video Story Portal',
+      title: 'Najtvrđe Jaje',
       description: 'Video stories and articles',
     }
   }
@@ -257,7 +257,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
     const errorInfo = getErrorInfo(error)
     console.warn('Failed to generate metadata:', errorInfo.message)
     return {
-      title: 'Video Story Portal',
+      title: 'Najtvrđe Jaje',
       description: 'Video stories and articles',
     }
   }

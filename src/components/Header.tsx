@@ -47,7 +47,7 @@ export default function Header({ logoUrl, siteName = 'Najtvrđe Jaje' }: HeaderP
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-4 lg:space-x-6">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
             <Link href="/" className="text-primary-700 hover:text-primary-500 transition-colors font-medium text-sm py-2 border-b-2 border-transparent hover:border-gold-500">
               Početna
             </Link>
@@ -68,6 +68,15 @@ export default function Header({ logoUrl, siteName = 'Najtvrđe Jaje' }: HeaderP
             </Link>
             <Link href="/contact" className="text-primary-700 hover:text-primary-500 transition-colors font-medium text-sm py-2 border-b-2 border-transparent hover:border-gold-500">
               Kontakt
+            </Link>
+            <Link
+              href="/admin"
+              className="ml-2 p-2 text-gray-400 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
+              title="Administracija"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </Link>
           </div>
 
@@ -150,6 +159,18 @@ export default function Header({ logoUrl, siteName = 'Najtvrđe Jaje' }: HeaderP
                 >
                   Kontakt
                 </Link>
+                <div className="border-t border-gray-200 mt-2 pt-2">
+                  <Link 
+                    href="/admin" 
+                    className="flex items-center gap-2 px-4 py-3 text-gray-400 hover:bg-primary-50 hover:text-primary-600 rounded-xl font-medium text-sm transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Administracija
+                  </Link>
+                </div>
               </div>
             </div>
           </>

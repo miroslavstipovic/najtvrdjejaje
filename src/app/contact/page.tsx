@@ -278,6 +278,6 @@ export default async function ContactPage() {
 }
 
 export const metadata = {
-  title: 'Contact Us - Video Portal',
-  description: 'Get in touch with the Video Portal team for questions, support, or partnerships.',
+  title: 'Kontakt - Najtvrđe Jaje',
+  description: 'Kontaktirajte tim portala Najtvrđe Jaje za pitanja, podršku ili suradnju.',
 }

@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
+export const revalidate = 60
+
 export default async function AboutPage() {
   // Get site settings for about content
   let aboutContent, aboutTitle, missionStatement, teamDescription
@@ -66,11 +68,9 @@ export default async function AboutPage() {
           <div className="prose prose-lg max-w-none mb-16">
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                {aboutContent?.value || `Welcome to Video Portal - your premier destination for engaging video stories and news content.
+                {aboutContent?.value || `Dobrodošli na Najtvrđe Jaje - portal posvećen tradiciji natjecanja u tucanju jaja.
 
-We are passionate about bringing you the latest stories, insights, and entertainment through the power of video. Our platform connects creators and audiences, fostering a community built around compelling visual storytelling.
-
-Whether you're looking for breaking news, educational content, or entertainment, Video Portal provides a curated experience designed to inform, inspire, and engage.`}
+Naša platforma prati natjecanja, rang liste i rezultate natjecatelja u ovom jedinstvenom sportskom nadmetanju. Pridružite nam se u čuvanju ove prekrasne tradicije.`}
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@ Whether you're looking for breaking news, educational content, or entertainment,
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Naš tim</h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                {teamDescription?.value || 'We are a dedicated team of content creators, technologists, and storytellers working together to deliver exceptional video experiences.'}
+                {teamDescription?.value || 'Mi smo posvećeni tim entuzijasta koji radi na očuvanju i promicanju tradicije tucanja jaja.'}
               </p>
             </div>
           </div>
@@ -117,6 +117,6 @@ Whether you're looking for breaking news, educational content, or entertainment,
 }
 
 export const metadata = {
-  title: 'O nama - Video Portal',
-  description: 'Saznajte više o Video Portalu i našoj misiji pružanja zanimljivog video sadržaja.',
+  title: 'O nama - Najtvrđe Jaje',
+  description: 'Saznajte više o portalu Najtvrđe Jaje i našoj misiji očuvanja tradicije tucanja jaja.',
 }

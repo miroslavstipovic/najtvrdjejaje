@@ -280,7 +280,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Skip metadata generation during build if no database URL
   if (!process.env.PRISMA_POSTGRES) {
     return {
-      title: 'Video Story Portal',
+      title: 'Najtvrđe Jaje',
       description: 'Browse video stories and articles by category',
     }
   }
@@ -296,13 +296,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 
     return {
-      title: `${category.name} - Video Portal`,
+      title: `${category.name} - Najtvrđe Jaje`,
       description: category.description || `Browse articles in ${category.name}`,
     }
   } catch (error) {
     console.warn('Failed to generate metadata:', error)
     return {
-      title: 'Video Story Portal',
+      title: 'Najtvrđe Jaje',
       description: 'Browse video stories and articles by category',
     }
   }

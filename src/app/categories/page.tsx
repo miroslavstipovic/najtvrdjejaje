@@ -187,6 +187,6 @@ export default async function CategoriesPage() {
 }
 
 export const metadata = {
-  title: 'Categories - Video Portal',
-  description: 'Browse all video content categories available on Video Portal.',
+  title: 'Kategorije - Najtvrđe Jaje',
+  description: 'Pregledajte sve kategorije sadržaja na portalu Najtvrđe Jaje.',
 }
