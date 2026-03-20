@@ -2,18 +2,45 @@ import { cache } from 'react'
 import { prisma } from '@/lib/prisma'
 
 /**
- * Get all active competitors with rankings
+ * Get all active competitors with their global ranking data
  */
 export const getAllCompetitors = cache(async () => {
   try {
-    return await prisma.competitor.findMany({
+    const competitors = await prisma.competitor.findMany({
       where: {
         isActive: true,
       },
-      orderBy: {
-        totalEggsBroken: 'desc',
+      include: {
+        rankings: {
+          where: { competitionId: null },
+          select: {
+            position: true,
+            weightedPoints: true,
+            wins: true,
+            losses: true,
+            eggsBroken: true,
+            eggsLost: true,
+          },
+          take: 1,
+        },
       },
     })
+
+    return competitors
+      .map((c) => {
+        const globalRank = c.rankings[0] || null
+        return {
+          ...c,
+          globalPosition: globalRank?.position ?? null,
+          globalWeightedPoints: globalRank?.weightedPoints ?? 0,
+        }
+      })
+      .sort((a, b) => {
+        if (a.globalPosition === null && b.globalPosition === null) return 0
+        if (a.globalPosition === null) return 1
+        if (b.globalPosition === null) return -1
+        return a.globalPosition - b.globalPosition
+      })
   } catch (error) {
     console.error('Error fetching competitors:', error)
     return []

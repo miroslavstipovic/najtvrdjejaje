@@ -134,6 +134,9 @@ export default function CompetitorProfilePage() {
     ? (competitor.totalEggsBroken / competitor.totalEggsLost).toFixed(2) 
     : competitor.totalEggsBroken > 0 ? '∞' : '0.00'
 
+  const globalRanking = competitor.rankings.find((r: Ranking) => r.competition === null)
+  const tournamentRankings = competitor.rankings.filter((r: Ranking) => r.competition !== null)
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-custom">
@@ -196,30 +199,44 @@ export default function CompetitorProfilePage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-5 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
+          {globalRanking && (
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-gold-600">
+                #{globalRanking.position}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-500 mt-1">Pozicija</div>
+            </div>
+          )}
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center border-2 border-primary-100">
             <div className="text-3xl sm:text-4xl font-bold text-primary-600">
+              {globalRanking?.weightedPoints ?? 0}
+            </div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1">BRJ bodovi</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center">
+            <div className="text-3xl sm:text-4xl font-bold text-gray-800">
               {competitor.totalEggsBroken}
             </div>
-            <div className="text-sm text-gray-500 mt-1">BRJ (Razbijena jaja)</div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1">Razbijena jaja</div>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-5 text-center">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center">
             <div className="text-3xl sm:text-4xl font-bold text-green-600">
               {competitor.totalWins}
             </div>
-            <div className="text-sm text-gray-500 mt-1">Pobjeda</div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1">Pobjeda</div>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-5 text-center">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center">
             <div className="text-3xl sm:text-4xl font-bold text-red-500">
               {competitor.totalLosses}
             </div>
-            <div className="text-sm text-gray-500 mt-1">Poraza</div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1">Poraza</div>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-5 text-center">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 text-center">
             <div className="text-3xl sm:text-4xl font-bold text-gold-600">
               {winRate.toFixed(1)}%
             </div>
-            <div className="text-sm text-gray-500 mt-1">Postotak pobjeda</div>
+            <div className="text-xs sm:text-sm text-gray-500 mt-1">% pobjeda</div>
           </div>
         </div>
 
@@ -247,34 +264,66 @@ export default function CompetitorProfilePage() {
         </div>
 
         {/* Tournament Rankings */}
-        {competitor.rankings.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        {tournamentRankings.length > 0 && (
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">🏆 Rezultati po turnirima</h2>
-            <div className="overflow-x-auto">
+
+            {/* Mobile: Card layout */}
+            <div className="space-y-3 sm:hidden">
+              {tournamentRankings.map((ranking) => (
+                <div key={ranking.id} className="bg-gray-50 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <Link
+                      href={`/turniri/${ranking.competition!.slug}`}
+                      className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                    >
+                      {ranking.competition!.name}
+                    </Link>
+                    <span className={`
+                      inline-flex items-center justify-center w-7 h-7 rounded-full font-bold text-xs
+                      ${ranking.position === 1 ? 'bg-yellow-100 text-yellow-700' :
+                        ranking.position === 2 ? 'bg-gray-200 text-gray-700' :
+                        ranking.position === 3 ? 'bg-orange-100 text-orange-700' :
+                        'bg-blue-50 text-blue-600'}
+                    `}>
+                      {ranking.position}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-gray-600">
+                    <span>BRJ: <strong className="text-primary-600">{ranking.weightedPoints}</strong></span>
+                    <span>
+                      <span className="text-green-600 font-medium">{ranking.wins}W</span>
+                      {' / '}
+                      <span className="text-red-500 font-medium">{ranking.losses}L</span>
+                    </span>
+                    <span>🥚 {ranking.eggsBroken}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table layout */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4 font-semibold text-gray-600">Turnir</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-600">Plasman</th>
-                    <th className="text-center py-3 px-4 font-semibold text-gray-600">Bodovi</th>
+                    <th className="text-center py-3 px-4 font-semibold text-gray-600">BRJ bodovi</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-600">P/I</th>
-                    <th className="text-center py-3 px-4 font-semibold text-gray-600">BRJ</th>
+                    <th className="text-center py-3 px-4 font-semibold text-gray-600">Razbijena jaja</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {competitor.rankings.map((ranking) => (
+                  {tournamentRankings.map((ranking) => (
                     <tr key={ranking.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4">
-                        {ranking.competition ? (
-                          <Link
-                            href={`/turniri/${ranking.competition.slug}`}
-                            className="text-primary-600 hover:text-primary-700 font-medium"
-                          >
-                            {ranking.competition.name}
-                          </Link>
-                        ) : (
-                          <span className="text-gray-500">Opća rang lista</span>
-                        )}
+                        <Link
+                          href={`/turniri/${ranking.competition!.slug}`}
+                          className="text-primary-600 hover:text-primary-700 font-medium"
+                        >
+                          {ranking.competition!.name}
+                        </Link>
                       </td>
                       <td className="text-center py-3 px-4">
                         <span className={`
