@@ -189,8 +189,8 @@ export async function PATCH(
     })
 
     const multiplier = existingMatch.round?.pointMultiplier || 1
+    const roundType = existingMatch.round?.roundType || ''
 
-    // If match is being completed, update BRJ statistics
     if (isBeingCompleted && updateData.result) {
       await updateStatsOnMatchComplete(
         existingMatch.homeCompetitorId,
@@ -199,17 +199,16 @@ export async function PATCH(
         finalAwayEggs,
         updateData.result,
         existingMatch.competitionId,
-        multiplier
+        multiplier,
+        roundType
       )
     }
 
-    // If match was already completed and result/eggs changed, need to reverse and reapply
     if (wasCompleted && (
       existingMatch.result !== updateData.result ||
       existingMatch.homeEggsBroken !== finalHomeEggs ||
       existingMatch.awayEggsBroken !== finalAwayEggs
     )) {
-      // Reverse old result
       if (existingMatch.result) {
         await reverseMatchResult(
           existingMatch.homeCompetitorId,
@@ -218,10 +217,10 @@ export async function PATCH(
           existingMatch.awayEggsBroken,
           existingMatch.result,
           existingMatch.competitionId,
-          multiplier
+          multiplier,
+          roundType
         )
       }
-      // Apply new result if match is still completed
       if (status !== 'cancelled' && updateData.result) {
         await updateStatsOnMatchComplete(
           existingMatch.homeCompetitorId,
@@ -230,7 +229,8 @@ export async function PATCH(
           finalAwayEggs,
           updateData.result,
           existingMatch.competitionId,
-          multiplier
+          multiplier,
+          roundType
         )
       }
     }
@@ -282,6 +282,7 @@ export async function DELETE(
     // If match was completed, reverse the statistics
     if (match.status === 'completed' && match.result) {
       const multiplier = match.round?.pointMultiplier || 1
+      const roundType = match.round?.roundType || ''
       await reverseMatchResult(
         match.homeCompetitorId,
         match.awayCompetitorId,
@@ -289,7 +290,8 @@ export async function DELETE(
         match.awayEggsBroken,
         match.result,
         match.competitionId,
-        multiplier
+        multiplier,
+        roundType
       )
     }
 
@@ -308,7 +310,10 @@ export async function DELETE(
   }
 }
 
-// Helper to update stats when match is completed - BRJ sustav
+const WIN_BONUS = 25
+const LOSS_PENALTY = 5
+const FINALIST_BONUS = 75
+
 async function updateStatsOnMatchComplete(
   homeId: number,
   awayId: number,
@@ -316,9 +321,9 @@ async function updateStatsOnMatchComplete(
   awayEggsBroken: number,
   result: string,
   competitionId: number | null,
-  multiplier: number = 1
+  multiplier: number = 1,
+  roundType: string = ''
 ) {
-  // Update competitor totals
   const homeUpdate: any = {
     totalEggsBroken: { increment: homeEggsBroken },
     totalEggsLost: { increment: awayEggsBroken },
@@ -341,13 +346,10 @@ async function updateStatsOnMatchComplete(
     prisma.competitor.update({ where: { id: awayId }, data: awayUpdate }),
   ])
 
-  const WIN_BONUS = 25
-  const LOSS_PENALTY = 5
-
-  // Update competition rankings
   if (competitionId) {
-    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY)
-    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY)
+    const finalistBonus = roundType === 'final' ? FINALIST_BONUS : 0
+    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
+    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
 
     await Promise.all([
       prisma.ranking.upsert({
@@ -416,7 +418,6 @@ async function updateStatsOnMatchComplete(
   }
 }
 
-// Helper to reverse match result (for deletion or result change) - BRJ sustav
 async function reverseMatchResult(
   homeId: number,
   awayId: number,
@@ -424,9 +425,9 @@ async function reverseMatchResult(
   awayEggsBroken: number,
   result: string,
   competitionId: number | null,
-  multiplier: number = 1
+  multiplier: number = 1,
+  roundType: string = ''
 ) {
-  // Reverse competitor stats
   const homeUpdate: any = {
     totalEggsBroken: { decrement: homeEggsBroken },
     totalEggsLost: { decrement: awayEggsBroken },
@@ -449,13 +450,10 @@ async function reverseMatchResult(
     prisma.competitor.update({ where: { id: awayId }, data: awayUpdate }),
   ])
 
-  const REV_WIN_BONUS = 25
-  const REV_LOSS_PENALTY = 5
-
-  // Reverse competition rankings
   if (competitionId) {
-    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? REV_WIN_BONUS : -REV_LOSS_PENALTY)
-    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? REV_WIN_BONUS : -REV_LOSS_PENALTY)
+    const finalistBonus = roundType === 'final' ? FINALIST_BONUS : 0
+    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
+    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
 
     await Promise.all([
       prisma.ranking.update({

@@ -56,9 +56,70 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Scoring constants
+const WIN_BONUS = 25
+const LOSS_PENALTY = 5
+const FINALIST_BONUS = 75
+
+/**
+ * Auto-fix: split "final" rounds that contain both the championship match
+ * and the 3rd place match into two separate rounds.
+ */
+async function autoFixFinalRounds(competitionId: number) {
+  const finalRounds = await prisma.round.findMany({
+    where: { competitionId, roundType: 'final' },
+    include: { matches: true },
+  })
+
+  for (const round of finalRounds) {
+    if (round.matches.length <= 1) continue
+
+    const semiRound = await prisma.round.findFirst({
+      where: { competitionId, roundType: 'semifinal' },
+      include: { matches: { where: { status: 'completed', result: { not: null } } } },
+    })
+    if (!semiRound || semiRound.matches.length === 0) continue
+
+    const semifinalWinners = new Set<number>()
+    for (const m of semiRound.matches) {
+      if (m.result === 'home_win') semifinalWinners.add(m.homeCompetitorId)
+      if (m.result === 'away_win') semifinalWinners.add(m.awayCompetitorId)
+    }
+
+    const thirdPlaceMatchIds: number[] = []
+    for (const m of round.matches) {
+      const bothFinalists = semifinalWinners.has(m.homeCompetitorId) && semifinalWinners.has(m.awayCompetitorId)
+      if (!bothFinalists) thirdPlaceMatchIds.push(m.id)
+    }
+    if (thirdPlaceMatchIds.length === 0) continue
+
+    const origNumber = round.roundNumber
+    await prisma.round.update({
+      where: { id: round.id },
+      data: { roundNumber: origNumber + 1 },
+    })
+
+    const thirdPlaceRound = await prisma.round.create({
+      data: {
+        competitionId,
+        roundNumber: origNumber,
+        name: 'Meč za 3. mjesto',
+        roundType: 'third_place',
+        pointMultiplier: round.pointMultiplier,
+      },
+    })
+
+    await prisma.match.updateMany({
+      where: { id: { in: thirdPlaceMatchIds } },
+      data: { roundId: thirdPlaceRound.id },
+    })
+  }
+}
+
 // Recalculate rankings for a specific competition - BRJ sustav
 async function recalculateCompetitionRankings(competitionId: number) {
-  // Get all completed matches for this competition with round info for multiplier
+  await autoFixFinalRounds(competitionId)
+
   const matches = await prisma.match.findMany({
     where: {
       competitionId,
@@ -66,17 +127,15 @@ async function recalculateCompetitionRankings(competitionId: number) {
       result: { not: null },
     },
     include: {
-      round: { select: { pointMultiplier: true, groupNumber: true } },
+      round: { select: { pointMultiplier: true, groupNumber: true, roundType: true } },
     },
     orderBy: { matchDate: 'asc' },
   })
 
-  // Get all competitors in this competition
   const rankings = await prisma.ranking.findMany({
     where: { competitionId },
   })
 
-  // Reset all rankings
   const competitorStats: Map<number, { 
     points: number; 
     weightedPoints: number;
@@ -97,15 +156,12 @@ async function recalculateCompetitionRankings(competitionId: number) {
     })
   }
 
-  // Scoring constants: reward wins, penalize losses
-  const WIN_BONUS = 25
-  const LOSS_PENALTY = 5
-
-  // Process each match
   for (const match of matches) {
     if (!match.result) continue
 
     const multiplier = match.round?.pointMultiplier || 1
+    const roundType = match.round?.roundType || ''
+    const isFinale = roundType === 'final'
     const homeStats = competitorStats.get(match.homeCompetitorId)
     const awayStats = competitorStats.get(match.awayCompetitorId)
 
@@ -113,6 +169,7 @@ async function recalculateCompetitionRankings(competitionId: number) {
       homeStats.points += match.homeEggsBroken
       homeStats.eggsBroken += match.homeEggsBroken
       homeStats.eggsLost += match.awayEggsBroken
+      if (isFinale) homeStats.weightedPoints += FINALIST_BONUS
 
       if (match.result === 'home_win') {
         homeStats.wins += 1
@@ -127,6 +184,7 @@ async function recalculateCompetitionRankings(competitionId: number) {
       awayStats.points += match.awayEggsBroken
       awayStats.eggsBroken += match.awayEggsBroken
       awayStats.eggsLost += match.homeEggsBroken
+      if (isFinale) awayStats.weightedPoints += FINALIST_BONUS
 
       if (match.result === 'away_win') {
         awayStats.wins += 1
@@ -138,7 +196,6 @@ async function recalculateCompetitionRankings(competitionId: number) {
     }
   }
 
-  // Update all rankings in database
   for (const ranking of rankings) {
     const stats = competitorStats.get(ranking.competitorId)
     if (stats) {
@@ -156,7 +213,6 @@ async function recalculateCompetitionRankings(competitionId: number) {
     }
   }
 
-  // Recalculate positions - primary: wins, secondary: weightedPoints (BRJ + bonus)
   const updatedRankings = await prisma.ranking.findMany({
     where: { competitionId },
     orderBy: [
@@ -184,7 +240,6 @@ async function recalculateCompetitionRankings(competitionId: number) {
 
 // Recalculate all BRJ statistics from historical matches
 async function recalculateAllBRJ() {
-  // Get all completed matches ordered by date (chronologically)
   const matches = await prisma.match.findMany({
     where: {
       status: 'completed',
@@ -197,6 +252,7 @@ async function recalculateAllBRJ() {
     include: {
       homeCompetitor: { select: { id: true } },
       awayCompetitor: { select: { id: true } },
+      round: { select: { pointMultiplier: true, roundType: true } },
     },
   })
 

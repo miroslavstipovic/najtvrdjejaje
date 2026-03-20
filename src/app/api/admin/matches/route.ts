@@ -253,9 +253,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // If match is completed with result, update BRJ statistics
     if (status === 'completed' && result) {
       const multiplier = round?.pointMultiplier || 1
+      const roundType = round?.roundType || ''
       await updateCompetitorBRJ(
         homeCompetitorId, 
         awayCompetitorId, 
@@ -263,7 +263,8 @@ export async function POST(request: NextRequest) {
         awayEggs, 
         result, 
         competitionId,
-        multiplier
+        multiplier,
+        roundType
       )
     }
 
@@ -277,7 +278,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to update competitor BRJ statistics
+// Scoring constants
+const WIN_BONUS = 25
+const LOSS_PENALTY = 5
+const FINALIST_BONUS = 75
+
 async function updateCompetitorBRJ(
   homeId: number,
   awayId: number,
@@ -285,9 +290,9 @@ async function updateCompetitorBRJ(
   awayEggsBroken: number,
   result: string,
   competitionId: number | null,
-  multiplier: number = 1
+  multiplier: number = 1,
+  roundType: string = ''
 ) {
-  // Update competitor totals
   const homeUpdate: any = {
     totalEggsBroken: { increment: homeEggsBroken },
     totalEggsLost: { increment: awayEggsBroken },
@@ -310,25 +315,13 @@ async function updateCompetitorBRJ(
     prisma.competitor.update({ where: { id: awayId }, data: awayUpdate }),
   ])
 
-  // Update competition rankings if applicable
   if (competitionId) {
     await updateCompetitionRankings(
-      competitionId, 
-      homeId, 
-      awayId, 
-      homeEggsBroken, 
-      awayEggsBroken, 
-      result,
-      multiplier
+      competitionId, homeId, awayId, homeEggsBroken, awayEggsBroken, result, multiplier, roundType
     )
   }
 }
 
-// Scoring constants: reward wins, penalize losses
-const WIN_BONUS = 25
-const LOSS_PENALTY = 5
-
-// Helper function to update competition rankings - BRJ sustav
 async function updateCompetitionRankings(
   competitionId: number,
   homeId: number,
@@ -336,10 +329,12 @@ async function updateCompetitionRankings(
   homeEggsBroken: number,
   awayEggsBroken: number,
   result: string,
-  multiplier: number = 1
+  multiplier: number = 1,
+  roundType: string = ''
 ) {
-  const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY)
-  const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY)
+  const finalistBonus = roundType === 'final' ? FINALIST_BONUS : 0
+  const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
+  const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY) + finalistBonus
 
   // Update or create home ranking
   await prisma.ranking.upsert({
