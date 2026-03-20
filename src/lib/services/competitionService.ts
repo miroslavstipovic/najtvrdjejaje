@@ -58,8 +58,8 @@ export const getCompetitionBySlug = cache(async (slug: string) => {
           },
           orderBy: [
             { position: 'asc' },
-            { wins: 'desc' },
             { weightedPoints: 'desc' },
+            { wins: 'desc' },
           ],
         },
         _count: {

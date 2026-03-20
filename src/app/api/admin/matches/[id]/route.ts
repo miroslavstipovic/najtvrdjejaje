@@ -398,12 +398,12 @@ async function updateStatsOnMatchComplete(
       }),
     ])
 
-    // Recalculate positions - primary: wins, secondary: weightedPoints
+    // Recalculate positions - primary: weightedPoints, secondary: wins
     const rankings = await prisma.ranking.findMany({
       where: { competitionId },
       orderBy: [
-        { wins: 'desc' },
         { weightedPoints: 'desc' },
+        { wins: 'desc' },
         { eggsBroken: 'desc' },
         { eggsLost: 'asc' },
       ],
@@ -480,12 +480,12 @@ async function reverseMatchResult(
       }).catch(() => {}),
     ])
 
-    // Recalculate positions - primary: wins, secondary: weightedPoints
+    // Recalculate positions - primary: weightedPoints, secondary: wins
     const rankings = await prisma.ranking.findMany({
       where: { competitionId },
       orderBy: [
-        { wins: 'desc' },
         { weightedPoints: 'desc' },
+        { wins: 'desc' },
         { eggsBroken: 'desc' },
         { eggsLost: 'asc' },
       ],

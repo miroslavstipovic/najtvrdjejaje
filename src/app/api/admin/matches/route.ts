@@ -400,15 +400,15 @@ async function updateCompetitionRankings(
 
 // Helper to recalculate ranking positions
 async function recalculateRankingPositions(competitionId: number) {
-  const rankings = await prisma.ranking.findMany({
-    where: { competitionId },
-    orderBy: [
-      { wins: 'desc' },
-      { weightedPoints: 'desc' },
-      { eggsBroken: 'desc' },
-      { eggsLost: 'asc' },
-    ],
-  })
+    const rankings = await prisma.ranking.findMany({
+      where: { competitionId },
+      orderBy: [
+        { weightedPoints: 'desc' },
+        { wins: 'desc' },
+        { eggsBroken: 'desc' },
+        { eggsLost: 'asc' },
+      ],
+    })
 
   for (let i = 0; i < rankings.length; i++) {
     await prisma.ranking.update({

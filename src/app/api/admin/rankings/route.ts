@@ -116,8 +116,8 @@ export async function GET(request: NextRequest) {
       where: whereClause,
       orderBy: [
         { position: 'asc' },
-        { wins: 'desc' },
         { weightedPoints: 'desc' },
+        { wins: 'desc' },
         { eggsBroken: 'desc' },
       ],
       include: {

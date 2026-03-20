@@ -216,8 +216,8 @@ async function recalculateCompetitionRankings(competitionId: number) {
   const updatedRankings = await prisma.ranking.findMany({
     where: { competitionId },
     orderBy: [
-      { wins: 'desc' },
       { weightedPoints: 'desc' },
+      { wins: 'desc' },
       { eggsBroken: 'desc' },
       { eggsLost: 'asc' },
     ],
@@ -357,8 +357,8 @@ async function recalculateAllBRJ() {
   }
 
   const sortedGlobal = [...globalStats.entries()].sort((a, b) => {
-    if (b[1].wins !== a[1].wins) return b[1].wins - a[1].wins
     if (b[1].weightedPoints !== a[1].weightedPoints) return b[1].weightedPoints - a[1].weightedPoints
+    if (b[1].wins !== a[1].wins) return b[1].wins - a[1].wins
     if (b[1].eggsBroken !== a[1].eggsBroken) return b[1].eggsBroken - a[1].eggsBroken
     return a[1].eggsLost - b[1].eggsLost
   })
