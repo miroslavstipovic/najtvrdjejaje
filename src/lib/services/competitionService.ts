@@ -56,9 +56,11 @@ export const getCompetitionBySlug = cache(async (slug: string) => {
           include: {
             competitor: true,
           },
-          orderBy: {
-            weightedPoints: 'desc',
-          },
+          orderBy: [
+            { position: 'asc' },
+            { wins: 'desc' },
+            { weightedPoints: 'desc' },
+          ],
         },
         _count: {
           select: {

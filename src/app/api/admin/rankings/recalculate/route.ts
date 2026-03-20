@@ -97,6 +97,10 @@ async function recalculateCompetitionRankings(competitionId: number) {
     })
   }
 
+  // Scoring constants: reward wins, penalize losses
+  const WIN_BONUS = 25
+  const LOSS_PENALTY = 5
+
   // Process each match
   for (const match of matches) {
     if (!match.result) continue
@@ -107,27 +111,29 @@ async function recalculateCompetitionRankings(competitionId: number) {
 
     if (homeStats) {
       homeStats.points += match.homeEggsBroken
-      homeStats.weightedPoints += match.homeEggsBroken * multiplier
       homeStats.eggsBroken += match.homeEggsBroken
       homeStats.eggsLost += match.awayEggsBroken
 
       if (match.result === 'home_win') {
         homeStats.wins += 1
+        homeStats.weightedPoints += match.homeEggsBroken * multiplier + WIN_BONUS
       } else if (match.result === 'away_win') {
         homeStats.losses += 1
+        homeStats.weightedPoints += match.homeEggsBroken * multiplier - LOSS_PENALTY
       }
     }
 
     if (awayStats) {
       awayStats.points += match.awayEggsBroken
-      awayStats.weightedPoints += match.awayEggsBroken * multiplier
       awayStats.eggsBroken += match.awayEggsBroken
       awayStats.eggsLost += match.homeEggsBroken
 
       if (match.result === 'away_win') {
         awayStats.wins += 1
+        awayStats.weightedPoints += match.awayEggsBroken * multiplier + WIN_BONUS
       } else if (match.result === 'home_win') {
         awayStats.losses += 1
+        awayStats.weightedPoints += match.awayEggsBroken * multiplier - LOSS_PENALTY
       }
     }
   }
@@ -150,13 +156,13 @@ async function recalculateCompetitionRankings(competitionId: number) {
     }
   }
 
-  // Recalculate positions - sorted by weightedPoints (BRJ s multiplikatorom)
+  // Recalculate positions - primary: wins, secondary: weightedPoints (BRJ + bonus)
   const updatedRankings = await prisma.ranking.findMany({
     where: { competitionId },
     orderBy: [
+      { wins: 'desc' },
       { weightedPoints: 'desc' },
       { eggsBroken: 'desc' },
-      { wins: 'desc' },
       { eggsLost: 'asc' },
     ],
   })

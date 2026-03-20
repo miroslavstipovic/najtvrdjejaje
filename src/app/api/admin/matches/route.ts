@@ -324,6 +324,10 @@ async function updateCompetitorBRJ(
   }
 }
 
+// Scoring constants: reward wins, penalize losses
+const WIN_BONUS = 25
+const LOSS_PENALTY = 5
+
 // Helper function to update competition rankings - BRJ sustav
 async function updateCompetitionRankings(
   competitionId: number,
@@ -334,9 +338,8 @@ async function updateCompetitionRankings(
   result: string,
   multiplier: number = 1
 ) {
-  // Bodovi = broj razbijenih jaja * multiplikator kruga
-  const homeWeightedPoints = homeEggsBroken * multiplier
-  const awayWeightedPoints = awayEggsBroken * multiplier
+  const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY)
+  const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY)
 
   // Update or create home ranking
   await prisma.ranking.upsert({
@@ -405,9 +408,9 @@ async function recalculateRankingPositions(competitionId: number) {
   const rankings = await prisma.ranking.findMany({
     where: { competitionId },
     orderBy: [
+      { wins: 'desc' },
       { weightedPoints: 'desc' },
       { eggsBroken: 'desc' },
-      { wins: 'desc' },
       { eggsLost: 'asc' },
     ],
   })

@@ -81,17 +81,54 @@ export const getCategoryArticleCount = cache(async (categoryId: number) => {
 })
 
 /**
+ * Get published competitions for homepage display
+ */
+export const getHomepageCompetitions = cache(async () => {
+  return await prisma.competition.findMany({
+    where: { isPublished: true },
+    orderBy: { startDate: 'desc' },
+    take: 4,
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      startDate: true,
+      endDate: true,
+      location: true,
+      status: true,
+      tournamentType: true,
+      coverImage: true,
+      numberOfGroups: true,
+      _count: {
+        select: { matches: true, rankings: true },
+      },
+      rankings: {
+        orderBy: { position: 'asc' },
+        take: 3,
+        select: {
+          position: true,
+          wins: true,
+          losses: true,
+          eggsBroken: true,
+          weightedPoints: true,
+          competitor: {
+            select: { id: true, name: true, slug: true, profileImage: true },
+          },
+        },
+      },
+    },
+  })
+})
+
+/**
  * Get homepage data with optimized parallel fetching
- * This function optimizes the query structure by:
- * 1. Fetching featured article and categories in parallel
- * 2. Fetching all category articles and counts in a single parallel batch
- * 3. Using Promise.all for maximum parallelism
  */
 export async function getHomepageData() {
-  // Step 1: Fetch featured article and categories in parallel
-  const [featuredArticle, categories] = await Promise.all([
+  const [featuredArticle, categories, competitions] = await Promise.all([
     getFeaturedArticle(),
     getCategories(),
+    getHomepageCompetitions(),
   ])
 
   // Step 2: Fetch all category data in parallel (articles + counts)
@@ -118,6 +155,7 @@ export async function getHomepageData() {
   return {
     featuredArticle,
     categories: categoryData,
+    competitions,
   }
 }
 

@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import FeaturedStory from '@/components/FeaturedStory'
 import CategoriesSection from '@/components/CategoriesSection'
 import HomepageAd from '@/components/HomepageAd'
+import HomepageTournaments from '@/components/HomepageTournaments'
 import FeaturedStorySkeleton from '@/components/skeletons/FeaturedStorySkeleton'
 import CategoriesSectionSkeleton from '@/components/skeletons/CategoriesSectionSkeleton'
 import { getHomepageData } from '@/lib/services/homepageService'
@@ -67,14 +68,14 @@ export const revalidate = 60
 export default async function HomePage() {
   let featuredArticle: FeaturedArticle | null = null
   let categories: Category[] = []
+  let competitions: any[] = []
 
   if (process.env.PRISMA_POSTGRES) {
     try {
-      // Use optimized service with parallel fetching
-      // This fetches featured article, categories, articles, and counts in parallel
-      const { featuredArticle: featured, categories: cats } = await getHomepageData()
-      featuredArticle = featured as FeaturedArticle | null
-      categories = cats as Category[]
+      const data = await getHomepageData()
+      featuredArticle = data.featuredArticle as FeaturedArticle | null
+      categories = data.categories as Category[]
+      competitions = data.competitions || []
     } catch (error) {
       console.warn('Failed to load homepage data:', error)
     }
@@ -89,7 +90,10 @@ export default async function HomePage() {
         ) : null}
       </Suspense>
 
-      {/* Ad between featured and categories */}
+      {/* Tournaments Section */}
+      <HomepageTournaments competitions={competitions} />
+
+      {/* Ad between tournaments and categories */}
       <div className="container-custom">
         <HomepageAd />
       </div>

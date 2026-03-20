@@ -115,10 +115,10 @@ export async function GET(request: NextRequest) {
     const rankings = await prisma.ranking.findMany({
       where: whereClause,
       orderBy: [
+        { position: 'asc' },
+        { wins: 'desc' },
         { weightedPoints: 'desc' },
         { eggsBroken: 'desc' },
-        { wins: 'desc' },
-        { eggsLost: 'asc' },
       ],
       include: {
         competitor: {

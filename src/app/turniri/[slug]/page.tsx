@@ -380,7 +380,7 @@ export default async function TurnirPage({ params }: PageProps) {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {competition.rankings
-                      .sort((a, b) => (b.weightedPoints || 0) - (a.weightedPoints || 0))
+                      .sort((a, b) => (a.position || 999) - (b.position || 999))
                       .map((ranking, index) => (
                       <tr 
                         key={ranking.id}

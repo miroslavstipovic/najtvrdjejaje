@@ -341,10 +341,13 @@ async function updateStatsOnMatchComplete(
     prisma.competitor.update({ where: { id: awayId }, data: awayUpdate }),
   ])
 
+  const WIN_BONUS = 25
+  const LOSS_PENALTY = 5
+
   // Update competition rankings
   if (competitionId) {
-    const homeWeightedPoints = homeEggsBroken * multiplier
-    const awayWeightedPoints = awayEggsBroken * multiplier
+    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? WIN_BONUS : -LOSS_PENALTY)
+    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? WIN_BONUS : -LOSS_PENALTY)
 
     await Promise.all([
       prisma.ranking.upsert({
@@ -393,13 +396,13 @@ async function updateStatsOnMatchComplete(
       }),
     ])
 
-    // Recalculate positions - sorted by weightedPoints (BRJ s multiplikatorom)
+    // Recalculate positions - primary: wins, secondary: weightedPoints
     const rankings = await prisma.ranking.findMany({
       where: { competitionId },
       orderBy: [
+        { wins: 'desc' },
         { weightedPoints: 'desc' },
         { eggsBroken: 'desc' },
-        { wins: 'desc' },
         { eggsLost: 'asc' },
       ],
     })
@@ -446,10 +449,13 @@ async function reverseMatchResult(
     prisma.competitor.update({ where: { id: awayId }, data: awayUpdate }),
   ])
 
+  const REV_WIN_BONUS = 25
+  const REV_LOSS_PENALTY = 5
+
   // Reverse competition rankings
   if (competitionId) {
-    const homeWeightedPoints = homeEggsBroken * multiplier
-    const awayWeightedPoints = awayEggsBroken * multiplier
+    const homeWeightedPoints = homeEggsBroken * multiplier + (result === 'home_win' ? REV_WIN_BONUS : -REV_LOSS_PENALTY)
+    const awayWeightedPoints = awayEggsBroken * multiplier + (result === 'away_win' ? REV_WIN_BONUS : -REV_LOSS_PENALTY)
 
     await Promise.all([
       prisma.ranking.update({
@@ -462,7 +468,7 @@ async function reverseMatchResult(
           eggsBroken: { decrement: homeEggsBroken },
           eggsLost: { decrement: awayEggsBroken },
         },
-      }).catch(() => {}), // Ignore if ranking doesn't exist
+      }).catch(() => {}),
       prisma.ranking.update({
         where: { competitionId_competitorId: { competitionId, competitorId: awayId } },
         data: {
@@ -476,13 +482,13 @@ async function reverseMatchResult(
       }).catch(() => {}),
     ])
 
-    // Recalculate positions
+    // Recalculate positions - primary: wins, secondary: weightedPoints
     const rankings = await prisma.ranking.findMany({
       where: { competitionId },
       orderBy: [
+        { wins: 'desc' },
         { weightedPoints: 'desc' },
         { eggsBroken: 'desc' },
-        { wins: 'desc' },
         { eggsLost: 'asc' },
       ],
     })

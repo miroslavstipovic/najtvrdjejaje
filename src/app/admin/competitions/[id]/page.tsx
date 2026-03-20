@@ -647,7 +647,7 @@ export default function CompetitionDetailsPage() {
                       {Array.from(new Set(knockoutStatus.groupStandings.map(s => s.groupNumber))).map(groupNum => {
                         const groupStandings = knockoutStatus.groupStandings!
                           .filter(s => s.groupNumber === groupNum)
-                          .sort((a, b) => b.weightedPoints - a.weightedPoints || b.eggsBroken - a.eggsBroken)
+                          .sort((a, b) => b.wins - a.wins || b.weightedPoints - a.weightedPoints || b.eggsBroken - a.eggsBroken)
                         
                         return (
                           <div key={groupNum} className="bg-white p-4">
@@ -930,7 +930,7 @@ function MatchRow({ match, onClick }: { match: Match; onClick: () => void }) {
 
 // Rankings Tab Component
 function RankingsTab({ rankings, onRecalculate }: { rankings: Ranking[]; onRecalculate: () => void }) {
-  const sortedRankings = [...rankings].sort((a, b) => b.weightedPoints - a.weightedPoints || b.eggsBroken - a.eggsBroken)
+  const sortedRankings = [...rankings].sort((a, b) => (a.position || 999) - (b.position || 999) || b.wins - a.wins || b.weightedPoints - a.weightedPoints)
 
   return (
     <div className="card overflow-hidden">

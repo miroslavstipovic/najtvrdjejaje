@@ -192,7 +192,7 @@ export async function POST(
       const groupRankings = groupStandings
         .filter(s => s.groupNumber === g)
         .sort((a, b) => {
-          // Sort by weightedPoints desc, then eggsBroken desc, then eggsLost asc
+          if (b.wins !== a.wins) return b.wins - a.wins
           if (b.weightedPoints !== a.weightedPoints) return b.weightedPoints - a.weightedPoints
           if (b.eggsBroken !== a.eggsBroken) return b.eggsBroken - a.eggsBroken
           return a.eggsLost - b.eggsLost
