@@ -50,7 +50,10 @@ export default async function RangListaPage() {
                         Natjecatelj
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        BRJ
+                        BRJ bodovi
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Razbijena jaja
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Pobjede
@@ -102,9 +105,12 @@ export default async function RangListaPage() {
                           </Link>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-lg font-semibold text-gray-900">
-                            {ranking.eggsBroken}
+                          <span className="text-lg font-semibold text-primary-600">
+                            {ranking.weightedPoints || 0}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                          {ranking.eggsBroken}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-green-600 font-medium">
                           {ranking.wins}

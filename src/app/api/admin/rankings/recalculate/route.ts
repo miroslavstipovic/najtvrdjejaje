@@ -324,7 +324,6 @@ async function recalculateAllBRJ() {
     })
   }
 
-  // Also recalculate all competition rankings
   const competitions = await prisma.competition.findMany({
     select: { id: true },
   })
@@ -333,10 +332,61 @@ async function recalculateAllBRJ() {
     await recalculateCompetitionRankings(comp.id)
   }
 
+  // Build global rankings by summing all per-competition rankings
+  const allCompRankings = await prisma.ranking.findMany({
+    where: { competitionId: { not: null } },
+  })
+
+  const globalStats: Map<number, {
+    weightedPoints: number; points: number;
+    wins: number; losses: number;
+    eggsBroken: number; eggsLost: number;
+  }> = new Map()
+
+  for (const r of allCompRankings) {
+    const existing = globalStats.get(r.competitorId) || {
+      weightedPoints: 0, points: 0, wins: 0, losses: 0, eggsBroken: 0, eggsLost: 0,
+    }
+    existing.weightedPoints += r.weightedPoints
+    existing.points += r.points
+    existing.wins += r.wins
+    existing.losses += r.losses
+    existing.eggsBroken += r.eggsBroken
+    existing.eggsLost += r.eggsLost
+    globalStats.set(r.competitorId, existing)
+  }
+
+  const sortedGlobal = [...globalStats.entries()].sort((a, b) => {
+    if (b[1].wins !== a[1].wins) return b[1].wins - a[1].wins
+    if (b[1].weightedPoints !== a[1].weightedPoints) return b[1].weightedPoints - a[1].weightedPoints
+    if (b[1].eggsBroken !== a[1].eggsBroken) return b[1].eggsBroken - a[1].eggsBroken
+    return a[1].eggsLost - b[1].eggsLost
+  })
+
+  await prisma.ranking.deleteMany({ where: { competitionId: null } })
+
+  for (let i = 0; i < sortedGlobal.length; i++) {
+    const [competitorId, stats] = sortedGlobal[i]
+    await prisma.ranking.create({
+      data: {
+        competitionId: null,
+        competitorId,
+        position: i + 1,
+        points: stats.points,
+        weightedPoints: stats.weightedPoints,
+        wins: stats.wins,
+        losses: stats.losses,
+        eggsBroken: stats.eggsBroken,
+        eggsLost: stats.eggsLost,
+      },
+    })
+  }
+
   return {
     message: 'Sve BRJ statistike uspješno preračunate',
     matchesProcessed: matches.length,
     competitorsUpdated: competitors.length,
     competitionsUpdated: competitions.length,
+    globalRankingsUpdated: sortedGlobal.length,
   }
 }
