@@ -7,7 +7,10 @@ import psycopg2
 from datetime import datetime, date
 from collections import defaultdict
 
-DB_URL = "***REDACTED***"
+import os
+DB_URL = os.environ.get("DATABASE_URL")
+if not DB_URL:
+    raise RuntimeError("DATABASE_URL environment variable is required")
 
 def generate_slug(name):
     s = name.lower()
