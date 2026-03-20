@@ -44,10 +44,12 @@ function getStatusBadge(status: string) {
   }
 }
 
-function getRoundTypeName(roundType: string) {
+function getRoundTypeName(roundType: string, roundName?: string) {
   switch (roundType) {
     case 'group':
       return 'Grupna faza'
+    case 'knockout':
+      return roundName || 'Eliminacijski krug'
     case 'round_of_16':
       return 'Osmina finala'
     case 'quarterfinal':
@@ -303,18 +305,38 @@ export default async function TurnirPage({ params }: PageProps) {
             </h2>
             
             <div className="space-y-6">
-              {['round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final'].map(roundType => {
-                const roundsOfType = knockoutRounds.filter(r => r.roundType === roundType)
-                if (roundsOfType.length === 0) return null
+              {(() => {
+                const knockoutByType = knockoutRounds.reduce((acc, round) => {
+                  const key = round.roundType === 'knockout' ? `knockout_${round.roundNumber}` : round.roundType
+                  if (!acc[key]) acc[key] = []
+                  acc[key].push(round)
+                  return acc
+                }, {} as Record<string, typeof knockoutRounds>)
                 
-                const allMatches = roundsOfType.flatMap(r => r.matches)
+                const orderedKeys = Object.keys(knockoutByType).sort((a, b) => {
+                  const order = ['knockout', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final']
+                  const typeA = a.startsWith('knockout_') ? 'knockout' : a
+                  const typeB = b.startsWith('knockout_') ? 'knockout' : b
+                  const idxA = order.indexOf(typeA)
+                  const idxB = order.indexOf(typeB)
+                  if (idxA !== idxB) return idxA - idxB
+                  const numA = knockoutByType[a][0]?.roundNumber || 0
+                  const numB = knockoutByType[b][0]?.roundNumber || 0
+                  return numA - numB
+                })
+                
+                return orderedKeys.map(key => {
+                  const rounds = knockoutByType[key]
+                  const allMatches = rounds.flatMap(r => r.matches)
+                  const roundType = rounds[0].roundType
+                  const roundName = rounds[0].name
                 
                 return (
-                  <div key={roundType} className="bg-white rounded-2xl shadow-md overflow-hidden">
+                  <div key={key} className="bg-white rounded-2xl shadow-md overflow-hidden">
                     <div className={`px-6 py-4 ${
                       roundType === 'final' ? 'bg-gold-500 text-white' : 'bg-primary-100 text-primary-900'
                     }`}>
-                      <h3 className="text-lg font-bold">{getRoundTypeName(roundType)}</h3>
+                      <h3 className="text-lg font-bold">{getRoundTypeName(roundType, roundName)}</h3>
                     </div>
                     
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -353,7 +375,8 @@ export default async function TurnirPage({ params }: PageProps) {
                     </div>
                   </div>
                 )
-              })}
+                })
+              })()}
             </div>
           </div>
         )}

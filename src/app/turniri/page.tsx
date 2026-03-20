@@ -105,6 +105,7 @@ export default async function TurniriPage() {
                     <div className="bg-primary-50 text-primary-700 px-3 py-1 rounded-lg text-sm font-medium">
                       {competition.tournamentType === 'berger' && '🔄 Bergerov sustav'}
                       {competition.tournamentType === 'knockout' && '🏆 Eliminacijski'}
+                      {competition.tournamentType === 'group_knockout' && '🏆 Grupna faza + Eliminacije'}
                       {competition.tournamentType === 'round_robin' && '⚡ Krug'}
                     </div>
                   </div>
