@@ -100,7 +100,7 @@ export default function ImageGallery({ mediaItems }: ImageGalleryProps) {
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
-          onClick={closeLightbox}
+          onClick={(e) => { if (e.target === e.currentTarget) closeLightbox(); }}
           onKeyDown={handleKeyDown}
           tabIndex={0}
           {...swipeHandlers}
@@ -121,7 +121,7 @@ export default function ImageGallery({ mediaItems }: ImageGalleryProps) {
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
-                className="absolute left-4 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70"
+                className="absolute left-4 z-50 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70"
                 aria-label="Previous"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export default function ImageGallery({ mediaItems }: ImageGalleryProps) {
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); goToNext(); }}
-                className="absolute right-4 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70"
+                className="absolute right-4 z-50 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70"
                 aria-label="Next"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
